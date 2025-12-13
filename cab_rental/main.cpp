@@ -8,62 +8,171 @@ struct Vehicle
     string plate_number;
     string brand_or_model;
     string vehicle_type;
-    int manufactured_year;
-    string availability;
+    string manufactured_year;
+    bool available;
 };
 
 struct Booking
 {
     string F_name;
     string L_name;
-    string id_number;
     string license_number;
     string phone_number;
-    string vehicle_type;
+    string plate_number;
     string address;
     string rented_date,return_date;
 };
 
+class Cab_rental_system
+{
+    vector<Vehicle> vehicles;
+    vector<Booking> bookings;
+    
+    public:void add_vehicle (string plate_number,string brand_or_model,string vehicle_type,bool available,string manufactured_year)
+    {
+        Vehicle vehicle;
+        vehicle.plate_number=plate_number;
+        vehicle.brand_or_model=brand_or_model;
+        vehicle.vehicle_type=vehicle_type;
+        vehicle.manufactured_year=manufactured_year;
+        vehicle.available=available;
+        vehicles.push_back(vehicle);
+    }
+    
+    public:void display_vehicle()
+    {
+        
+        cout <<"--All the vehicles you have--"<<endl;
+        cout <<"|"<<"plate_number"<<"\t"<<"|"<<"brand_or_model"<<"\t"<<"|"<<"vehicle_type"<<"\t"<<"|"<<"plate_number"<<"\t"<<"availability"<<endl;
+        for(int i=0;i<vehicles.size();i++)
+        {
+            cout<<"|"<<vehicles[i].plate_number<<"\t"<<"\t"<<"\t"<<"\t"<<"|"<<vehicles[i].brand_or_model<<"\t"<<"\t"<<"\t"<<"\t"<<"|"<<vehicles[i].vehicle_type<<"\t"<<"\t"<<"\t"<<"\t"<<"|"
+            <<endl;
+        }
+    }
+    
+    public:void display_bookings()
+    {
+        cout <<"--- ALL BOOKED CARS---"<<endl;
+        for (int i=0; i<bookings.size();i++)
+        {
+            cout<<"first name :"<<bookings[i].F_name<<endl;
+            cout<<"plate number :"<<bookings[i].plate_number<<endl;
+            
+        }
+    }
+    
+    
+    public:void book_vehicle(string F_name,string L_name,string license_number,string plate_number,string address,string phone_number)
+    {
+        int vehicle_index=search_vehicle(plate_number);
+        if (vehicle_index==-1)
+        {
+            cout <<"plate number doesnot exist!!!";
+            return ;
+        }
+        if (vehicles[vehicle_index].available)
+        {
+            vehicles[vehicle_index].available=false;
+        }
+        else
+        {
+            cout <<"not available";
+            return;
+        }
+        Booking book;
+        book.F_name=F_name;
+        book.L_name=L_name;
+        book.license_number=license_number;
+        book.plate_number=plate_number;
+        book.address=address;
+        book.phone_number=phone_number;
+        bookings.push_back(book);
+    }
+    
+    public:void return_vehicle (string plate_number )
+    {
+        int vehicle_index=search_vehicle(plate_number);
+        if (vehicle_index==-1)
+        {
+            cout <<"plate number doesnot exist!!!"<<endl;
+            return ;
+        }
+        vehicles[vehicle_index].available=true;
+        
+        int booking_index=search_booking( plate_number);
+        if (booking_index==-1)
+        {
+            cout <<"booking doesnot exist!!!";
+            return ;
+        }
+        else
+        {
+            bookings.erase(bookings.begin() + booking_index);
+        }
+    }
+    
+    int search_vehicle(string plate_number)
+    {
+        for (int i=0;i<vehicles.size();i++)
+        {
+            if (vehicles[i].plate_number==plate_number)
+            {
+                return i;
+            }
+        }
+        return -1;
+    }
+    
+    int search_booking (string plate_number)
+    {
+        for (int i=0;i<bookings.size();i++)
+        {
+            if (bookings[i].plate_number==plate_number)
+            {
+                return i;
+            }
+        }
+        return -1;
+    }
+};
 
-vector<Booking>renters;
-vector<Vehicle> vehicles;
 
 
 void welcome()
 {
-    cout <<"      _____________________________        "<<endl;
-    cout<<"------ 🚘Welcome To Our Cab Rental🚘 -------"<<endl;
-    cout <<"      -----------------------------         "<<endl;
-    cout << "              _____     " << endl;
-    cout << "           __/_____\\__     " << endl;
-    cout << "          |  _     _  |     " << endl;
-    cout << "          '-(o)---(o)-'     " << endl<<endl;
+    cout<<"      ___________________________        "<<endl;
+    cout<<"------- Welcome To Our Cab Rental -------"<<endl;
+    cout<<"      ---------------------------        "<<endl;
+    cout<<"              _____         " << endl;
+    cout<<"           __/_____\\__     " << endl;
+    cout<<"          |  _     _  |     " << endl;
+    cout<<"          '-(o)---(o)-'     " << endl<<endl;
 }
 
-void add_vehicle(int vehicle_size)
+void add_vehicle(int vehicle_size,Cab_rental_system cab_rental_system)
 {
     for(int i=0;i<vehicle_size;i++)
     {
-        Vehicle vehicle;
-        cout <<"* Add plate number \n";
+        string plate_number ,brand_or_model ,manufactured_year,vehicle_type;
+        cout<<" * Add plate number \n";
         cout<<"-->";
-        cin>>vehicle.plate_number;
-        cout <<"*Enter a brand or a model of the car \n";
+        cin>>plate_number;
+        cout<<" *Enter a brand or a model of the car \n";
         cout<<"-->";
-        cin>>vehicle.brand_or_model;
-        cout <<"* Enter a vehicle type\n";
+        cin>>brand_or_model;
+        cout<<" * Enter a vehicle type\n";
         cout<<"-->";
-        cin>>vehicle.vehicle_type;
-        cout <<"* Enter the manufactured year\n";
+        cin>>vehicle_type;
+        cout<<" * Enter the manufactured year\n";
         cout<<"-->";
-        cin>>vehicle.manufactured_year;
-        vehicles.push_back(vehicle);
-       
+        cin>>manufactured_year;
+        cab_rental_system.add_vehicle( plate_number,  brand_or_model,  vehicle_type, true ,  manufactured_year);
     }
     cout<<"---Vechile Added Successfully---\n";
 }
     
-    void register_customer()
+    void booking_cab(Cab_rental_system cab_rental_system)
     {
         cout <<"  ";
             Booking customer;
@@ -73,16 +182,13 @@ void add_vehicle(int vehicle_size)
             cout <<" *Enter Last Name \n";
             cout<<"-->";
             cin>>customer.L_name;
-            cout <<" *Enter ID Number \n";
-            cout<<"-->";
-            cin>>customer.id_number;
             cout <<" *Enter a license Number \n";
             cout<<"-->";
             cin>>customer.license_number;
-            cout<<" *Enter a Phone Number \n";
+            cout<<" *Enter a plate number \n";
             cout<<"-->";
-            cin>>customer.vehicle_type;
-            cout<<" *Enter the vehicle type \n";
+            cin>>customer.plate_number;
+            cout<<" *Enter the phone number\n";
             cout<<"-->";
             cin>>customer.phone_number;
             cout <<" *Enter an Address \n";
@@ -94,39 +200,35 @@ void add_vehicle(int vehicle_size)
             cout<<"*Enter the return date\n";
             cout<<"-->";
             cin>>customer.return_date;
-            renters.push_back(customer);
+        cab_rental_system.book_vehicle(customer.F_name, customer.L_name, customer.license_number, customer.plate_number, customer.address, customer.phone_number);
         
     }
+    
+void book_and_return(Cab_rental_system cab_rental_system)
+{
+    int input ;
+    cout <<"1, BOOK A VEHICLE"<<endl;
+    cout<<"2,retuen a vehicle"<<endl;
+    cin >> input;
+    if (input == 1)
+    {
+        booking_cab(cab_rental_system);
+    }
+    else if (input ==2)
+    {
+        string plate_number;
+        cout <<" enter plate number "<<endl;
+        cab_rental_system.return_vehicle(plate_number);
+    }
+}
 
-    
-    void display_customers()
-    {
-        cout <<"--All the customers you have--"<<endl;
-        cout <<"|"<<"first_name"<<"\t"<<"|"<<"last_name"<<"\t"<<"|"<<"id number"<<"\t"<<"|"<<"license_number"<<"\t"<<"|"<<"vehicle_type"<<"\t"<<"|"<<"phone_number"<<"\t"<<"|"<<"address"<<"\t"<<"rented_date"<<"\t"<<"|"<<"returned_date"<<endl;
-        for(int i=0;i<renters.size();i++)
-        {
-            cout<<"|"<<renters[i].F_name<<"\t"<<"\t"<<"|"<<renters[i].L_name<<"\t"<<"\t"<<"|"<<renters[i].id_number<<"\t"<<"\t"<<"|"<<renters[i].license_number<<"\t"<<"\t"<<"|"<< renters[i].vehicle_type<<"\t"<<"\t"<<"|"<<renters[i].phone_number<<"\t"<<"\t"<<"|"<<renters[i].address<<"\t"<<"\t"<<"|"<<renters[i].rented_date<<"\t"<<"\t"<<"|"<<renters[i].return_date<<endl;
-        }
-    }
-    
-    void display_vehicle()
-    {
-        cout <<"--All the vehicles you have--"<<endl;
-        cout <<"|"<<"plate_number"<<"\t"<<"|"<<"brand_or_model"<<"\t"<<"|"<<"vehicle_type"<<"\t"<<"|"<<"plate_number"<<"\t"<<"availability"<<endl;
-        for(int i=0;i<vehicles.size();i++)
-        {
-            cout<<"|"<<vehicles[i].plate_number<<"\t"<<"\t"<<"\t"<<"\t"<<"|"<<vehicles[i].brand_or_model<<"\t"<<"\t"<<"\t"<<"\t"<<"|"<<vehicles[i].vehicle_type<<"\t"<<"\t"<<"\t"<<"\t"<<"|"
-            <<endl;
-        }
-    }
-    
-    void menu ()
+    void menu (Cab_rental_system cab_rental_system)
     {
         int menu_number;
         cout<<"====MENU===="<<endl;
         cout<<"1, ADD A VEHICLE "<<endl;
-        cout<<"2, REGISTER A CUSTOMER "<<endl;
-        cout<<"3, DISPLAY ALL CUSTOMERS"<<endl;
+        cout<<"2, CAB BOOKING AND RETURNING "<<endl;
+        cout<<"3, DISPLAY ALL BOOKINGS"<<endl;
         cout<<"4,DISPLAY ALL VEHICLES"<<endl;
         cout<<"5, EXIT..."<<endl;
         cout<<"-->";
@@ -138,22 +240,22 @@ void add_vehicle(int vehicle_size)
             cout<<"how many vehicles you want to add"<<endl;
             cout<<"-->";
             cin>>vehicle_size;
-            add_vehicle(vehicle_size);
+            add_vehicle(vehicle_size,cab_rental_system);
         }
         else if (menu_number == 2)
         {
          
-            cout<<" --REGISTERING CUSTOMER--"<<endl;
+            cout<<" --BOOKING A RETURNING A CAB--"<<endl;
             
-            register_customer();
+            book_and_return(cab_rental_system);
         }
         else if (menu_number==3)
         {
-            display_customers();
+            cab_rental_system.display_bookings();
         }
         else if (menu_number==4)
         {
-            display_vehicle();
+            cab_rental_system.display_vehicle();
         }
         
         else if (menu_number == 5)
@@ -170,9 +272,10 @@ void add_vehicle(int vehicle_size)
     int main()
     {
         welcome();
+        Cab_rental_system cab_rental_system;
         while (true)
         {
-            menu();
+            menu(cab_rental_system);
         }
         
         return 0;
