@@ -11,6 +11,7 @@ struct Vehicle
     int manufactured_year;
     string availability;
 };
+
 struct Booking
 {
     string F_name;
